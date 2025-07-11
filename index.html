@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Smart Property Assistant</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
+
+  <style>
+    /*— BASE STYLES —*/
+    * { box-sizing: border-box; margin:0; padding:0; }
+    body {
+      font-family:'Roboto',sans-serif;
+      background:#f8f9fa; /* light gray */
+      color:#333;
+      min-height:100vh;
+      display:flex; flex-direction:column;
+      transition:background .3s,color .3s;
+      line-height:1.6;
+    }
+    a {
+      color:#0056b3; /* professional blue */
+      text-decoration:none;
+      transition:color .3s;
+    }
+    a:hover {
+      color:#003d80;
+      text-decoration:underline;
+    }
+
+    /* Navbar */
+    .navbar {
+      background:#ffffff;
+      padding:12px 32px;
+      display:flex; justify-content:space-between; align-items:center;
+      box-shadow:0 2px 6px rgba(0,0,0,0.1);
+      position:sticky; top:0; z-index:100;
+      animation:slideDown 0.8s ease-out;
+    }
+    .navbar .logo {
+      font-size:1.8rem;
+      font-weight:700;
+      color:#003d80;
+      letter-spacing: 1px;
+    }
+    .navbar a {
+      margin-left:24px;
+      font-weight:500;
+      font-size: 1rem;
+      color: #0056b3;
+    }
+    .navbar a:hover {
+      color: #00264d;
+    }
+    @keyframes slideDown {
+      from {transform:translateY(-100%);}
+      to {transform:translateY(0);}
+    }
+
+    /* MAIN CONTENT */
+    main.container.home {
+      flex:1;
+      max-width: 900px;
+      margin: 48px auto 64px;
+      padding: 0 24px;
+      text-align: center;
+      animation:fadeIn 1s ease;
+    }
+    @keyframes fadeIn {
+      from {opacity:0;}
+      to {opacity:1;}
+    }
+    h1 {
+      font-size:3rem;
+      margin-bottom:16px;
+      color:#00264d;
+      font-weight: 800;
+      letter-spacing: 1px;
+    }
+    .quote {
+      font-style:italic;
+      margin-bottom:32px;
+      color:#555;
+      font-size:1.3rem;
+      position:relative;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .quote::before {
+      content:"“";
+      font-size:3rem;
+      position:absolute;
+      left:-28px;
+      top:-20px;
+      color:#7a9cd9;
+      opacity: 0.3;
+    }
+    .quote::after {
+      content:"”";
+      font-size:3rem;
+      position:absolute;
+      right:-28px;
+      bottom:-20px;
+      color:#7a9cd9;
+      opacity: 0.3;
+    }
+
+    /* Button group */
+    .btn-group {
+      display:flex;
+      gap:24px;
+      justify-content:center;
+      flex-wrap: wrap;
+      margin-bottom:40px;
+    }
+    .btn {
+      background:#0056b3;
+      color:white;
+      padding:14px 32px;
+      font-size:1.1rem;
+      border:none;
+      border-radius:8px;
+      cursor:pointer;
+      font-weight:700;
+      box-shadow:0 6px 12px rgba(0,86,179,0.4);
+      transition: background-color 0.3s ease, transform 0.3s ease;
+      min-width: 140px;
+      text-align: center;
+      user-select: none;
+      display: inline-block;
+      text-decoration: none;
+    }
+    .btn:hover,
+    .btn:focus {
+      background-color:#003d80;
+      transform: translateY(-4px);
+      outline:none;
+      box-shadow: 0 8px 20px rgba(0,61,128,0.6);
+    }
+    .btn:active {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0,61,128,0.5);
+    }
+
+    /* Sections */
+    section {
+      margin-bottom:72px;
+      max-width:900px;
+      margin-left: auto;
+      margin-right: auto;
+      padding: 0 24px;
+      animation:fadeIn 1s ease;
+    }
+    section h2 {
+      text-align:center;
+      margin-bottom:36px;
+      color:#00264d;
+      font-weight: 700;
+      font-size: 2.2rem;
+      letter-spacing: 0.8px;
+    }
+
+    /* Features */
+    .features .feature-cards {
+      display:flex;
+      gap:24px;
+      flex-wrap:wrap;
+      justify-content:center;
+    }
+    .card {
+      background:white;
+      padding:28px 24px;
+      width:280px;
+      text-align:center;
+      border-radius:12px;
+      box-shadow:0 6px 18px rgba(0,0,0,0.08);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      display:flex;
+      flex-direction: column;
+      justify-content: center;
+      cursor: default;
+    }
+    .card:hover {
+      transform: translateY(-12px);
+      box-shadow:0 12px 28px rgba(0,0,0,0.15);
+    }
+    .card h3 {
+      margin-bottom:14px;
+      color:#003d80;
+      font-weight: 700;
+      font-size: 1.3rem;
+    }
+    .card p {
+      color:#555;
+      font-size: 1rem;
+      line-height: 1.4;
+    }
+
+    /* Testimonials */
+    .testimonials {
+      background:#f1f4fb;
+      padding:40px 32px;
+      border-radius:14px;
+      box-shadow:0 2px 12px rgba(0,0,0,0.06);
+      max-width: 720px;
+      margin-left: auto;
+      margin-right: auto;
+      text-align: center;
+      font-style: normal;
+    }
+    .testimonial-quote {
+      font-style: italic;
+      color:#004080;
+      font-size: 1.25rem;
+      margin-bottom: 20px;
+      position: relative;
+      line-height: 1.5;
+      max-width: 80%;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .testimonial-quote::before {
+      content: '“';
+      font-size: 3rem;
+      position: absolute;
+      left: -24px;
+      top: -10px;
+      color: #7a9cd9;
+      opacity: 0.3;
+    }
+    .testimonial-quote::after {
+      content: '”';
+      font-size: 3rem;
+      position: absolute;
+      right: -24px;
+      bottom: -14px;
+      color: #7a9cd9;
+      opacity: 0.3;
+    }
+    .testimonial-author {
+      color:#003366;
+      font-weight:700;
+      font-size: 1.1rem;
+      margin-bottom: 32px;
+    }
+
+    /* Tips */
+    .tips ul {
+      max-width:720px;
+      margin:auto;
+      text-align:left;
+      color:#222;
+      font-weight: 500;
+      list-style: disc inside;
+      font-size: 1.15rem;
+      line-height: 1.7;
+      padding-left: 8px;
+    }
+    .tips li {
+      margin:14px 0;
+    }
+
+    /* FAQ */
+    .faq-item {
+      background:white;
+      margin:20px auto;
+      max-width:720px;
+      text-align:left;
+      border-radius:10px;
+      padding:20px 28px;
+      box-shadow:0 6px 14px rgba(0,0,0,0.09);
+      cursor:pointer;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+      font-size: 1.15rem;
+      font-weight: 500;
+      user-select: none;
+    }
+    .faq-item:hover,
+    .faq-item:focus {
+      background:#e9f0ff;
+      transform: translateY(-3px);
+      outline:none;
+    }
+    .faq-item h3 {
+      margin-bottom: 12px;
+      color: #004080;
+      font-weight: 700;
+      font-size: 1.25rem;
+    }
+    .faq-answer {
+      display:none;
+      margin-top: 14px;
+      color:#444;
+      font-size:1.05rem;
+      line-height:1.5;
+      font-weight: 400;
+    }
+    .faq-item[aria-expanded="true"] .faq-answer {
+      display:block;
+    }
+
+    /* CONTACT */
+    .contact {
+      max-width:720px;
+      margin:auto;
+      text-align:center;
+      font-size: 1.15rem;
+      font-weight: 500;
+      color: #222;
+      line-height: 1.6;
+    }
+    .contact h2 {
+      margin-bottom:28px;
+      color:#003366;
+    }
+    .contact a {
+      font-weight: 600;
+      color: #0056b3;
+    }
+    .contact a:hover {
+      color: #00264d;
+    }
+
+    /* FOOTER */
+    footer {
+      background:#e3e8f7;
+      padding:16px 24px;
+      text-align:center;
+      font-size:0.9rem;
+      color:#003366;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+      user-select:none;
+    }
+    footer a {
+      color:#003366;
+      margin: 0 8px;
+      font-weight: 600;
+      text-decoration:none;
+      transition: color 0.3s;
+    }
+    footer a:hover {
+      color:#001f40;
+      text-decoration: underline;
+    }
+
+    /* CHATBOT */
+    #chatbot-btn {
+      position: fixed;
+      bottom: 28px;
+      right: 28px;
+      background: #0056b3;
+      border: none;
+      border-radius: 50%;
+      width: 52px;
+      height: 52px;
+      font-size: 28px;
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 8px 16px rgba(0,86,179,0.5);
+      transition: background-color 0.3s ease, transform 0.3s ease;
+      z-index: 1100;
+    }
+    #chatbot-btn:hover {
+      background: #003d80;
+      transform: translateY(-4px);
+      box-shadow: 0 12px 24px rgba(0,61,128,0.7);
+    }
+
+    #chatbot-window {
+      display: none;
+      flex-direction: column;
+      position: fixed;
+      bottom: 92px;
+      right: 28px;
+      width: 360px;
+      max-height: 480px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 12px 28px rgba(0,0,0,0.18);
+      z-index: 1100;
+      font-size: 1rem;
+      color: #222;
+      overflow: hidden;
+      animation: fadeIn 0.4s ease;
+      flex-shrink: 0;
+    }
+
+    #chatbot-header {
+      background: #003d80;
+      color: white;
+      font-weight: 700;
+      padding: 12px 16px;
+      font-size: 1.15rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      user-select:none;
+    }
+    #chatbot-close-btn {
+      background: transparent;
+      border: none;
+      color: white;
+      font-size: 24px;
+      line-height: 1;
+      cursor: pointer;
+      transition: color 0.3s ease;
+    }
+    #chatbot-close-btn:hover,
+    #chatbot-close-btn:focus {
+      color: #a8c1ff;
+      outline: none;
+    }
+
+    #chatbot-messages {
+      padding: 12px 16px;
+      flex: 1;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: #a8c1ff transparent;
+      font-size: 1rem;
+    }
+    #chatbot-messages::-webkit-scrollbar {
+      width: 6px;
+    }
+    #chatbot-messages::-webkit-scrollbar-thumb {
+      background-color: #a8c1ff;
+      border-radius: 4px;
+    }
+
+    .chatbot-message {
+      margin-bottom: 14px;
+      padding: 10px 14px;
+      border-radius: 14px;
+      max-width: 78%;
+      line-height: 1.4;
+      word-wrap: break-word;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      user-select: text;
+    }
+    .chatbot-message.user {
+      background: #e6f0ff;
+      color: #003366;
+      align-self: flex-end;
+      border-bottom-right-radius: 4px;
+    }
+    .chatbot-message.bot {
+      background: #d1d9ff;
+      color: #00264d;
+      align-self: flex-start;
+      border-bottom-left-radius: 4px;
+    }
+
+    #chatbot-input-area {
+      padding: 12px 16px;
+      display: flex;
+      border-top: 1px solid #e1e4ef;
+      background: #f7f9fc;
+    }
+    #chatbot-input {
+      flex: 1;
+      padding: 10px 14px;
+      font-size: 1rem;
+      border: 1px solid #b0c1e8;
+      border-radius: 8px;
+      outline:none;
+      transition: border-color 0.3s ease;
+    }
+    #chatbot-input:focus {
+      border-color: #0056b3;
+      box-shadow: 0 0 6px #a8c1ff;
+    }
+    #chatbot-send-btn {
+      background: #0056b3;
+      border: none;
+      margin-left: 12px;
+      padding: 10px 16px;
+      font-size: 1.3rem;
+      border-radius: 8px;
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,86,179,0.5);
+      transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+    #chatbot-send-btn:hover {
+      background: #003d80;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0,61,128,0.7);
+    }
+    #chatbot-send-btn:active {
+      transform: translateY(0);
+      box-shadow: 0 4px 12px rgba(0,61,128,0.5);
+    }
+
+    /* Responsive */
+    @media (max-width: 700px) {
+      .btn-group {
+        flex-direction: column;
+        gap: 16px;
+      }
+      .features .feature-cards {
+        flex-direction: column;
+        align-items: center;
+      }
+      .card {
+        width: 100%;
+        max-width: 340px;
+      }
+      #chatbot-window {
+        width: 90vw;
+        right: 5vw;
+        bottom: 80px;
+        max-height: 400px;
+      }
+      main.container.home {
+        margin: 32px 16px 48px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar" role="navigation" aria-label="Primary Navigation">
+     <div class="logo">🏠 RealEstateAI</div>
+    <div>
+      <a href="#features">Features</a>
+      <a href="#testimonials">Testimonials</a>
+      <a href="#tips">Tips</a>
+      <a href="#faq">FAQ</a>
+      <a href="#contact">Contact</a>
+    </div>
+  </nav>
+
+  <!-- HOME SECTION -->
+  <main class="container home" role="main" aria-label="Welcome section">
+    <h1>Smart Property Assistant</h1>
+    <p class="quote">Get real-time Bangalore property price estimates using AI — Fast, accurate, and free.</p>
+
+    <div class="btn-group">
+      <button class="btn" id="predictBtn" aria-label="Go to property price prediction page">Predict</button>
+      <button class="btn" id="compareBtn" aria-label="Go to property price comparison page">Compare</button>
+      <button class="btn" id="getEstimateBtn" aria-label="Open chatbot for price estimate">Chatbot</button>
+      <button class="btn" id="learnMoreBtn" aria-label="Learn more about features">Learn More</button>
+    </div>
+
+    <p>Powered by the latest AI technologies to analyze market trends and neighborhood data.</p>
+  </main>
+
+  <!-- FEATURES -->
+  <section id="features" class="features" aria-labelledby="features-heading">
+    <h2 id="features-heading">Key Features</h2>
+    <div class="feature-cards" role="list">
+      <div class="card" role="listitem">
+        <h3>AI-Powered Estimates</h3>
+        <p>Accurate property price predictions based on recent sales and market trends.</p>
+      </div>
+      <div class="card" role="listitem">
+        <h3>Neighborhood Analysis</h3>
+        <p>Insightful data about the best locations, schools, and amenities.</p>
+      </div>
+      <div class="card" role="listitem">
+        <h3>User-Friendly Chatbot</h3>
+        <p>Ask questions and get instant real estate advice tailored to Bangalore.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section id="testimonials" class="testimonials" aria-labelledby="testimonials-heading">
+    <h2 id="testimonials-heading">What Our Users Say</h2>
+    <p class="testimonial-quote">Using RealEstateAI saved me thousands on my property purchase!</p>
+    <p class="testimonial-author">– Anil K.</p>
+
+    <p class="testimonial-quote">Surprisingly accurate predictions and very easy to use.</p>
+    <p class="testimonial-author">– Priya M.</p>
+  </section>
+
+  <!-- TIPS -->
+  <section id="tips" class="tips" aria-labelledby="tips-heading">
+    <h2 id="tips-heading">Market Tips & Insights</h2>
+    <ul>
+      <li>Bangalore real estate trends in 2025</li>
+      <li>Top 5 up‑and‑coming neighborhoods</li>
+      <li>Essential tips for first‑time buyers</li>
+    </ul>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq" class="faq" aria-labelledby="faq-heading">
+    <h2 id="faq-heading">Frequently Asked Questions</h2>
+
+    <div class="faq-item" role="button" aria-expanded="false" tabindex="0" aria-controls="faq1">
+      <h3 id="faq1">How accurate are the predictions?</h3>
+      <p class="faq-answer">
+        Our AI model analyzes thousands of recent sale transactions, trends across neighborhoods, and key property features to generate highly reliable estimates. While they reflect current market conditions, please use them as guidance—not legal advice or financial guarantees.
+      </p>
+    </div>
+
+    <div class="faq-item" role="button" aria-expanded="false" tabindex="0" aria-controls="faq2">
+      <h3 id="faq2">Is my data secure?</h3>
+      <p class="faq-answer">
+        Absolutely. We never store personal data such as your email, IP address, or chat content. Your inputs are used only transiently to generate estimates and are promptly discarded—they are never shared with third parties.
+      </p>
+    </div>
+
+    <div class="faq-item" role="button" aria-expanded="false" tabindex="0" aria-controls="faq3">
+      <h3 id="faq3">Can I rely solely on this tool to decide?</h3>
+      <p class="faq-answer">
+        This assistant is designed to help you make informed decisions but should be used in conjunction with professional advice. We highly recommend consulting qualified real estate agents, lawyers, or financial advisors before making final commitments.
+      </p>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact" class="contact" aria-labelledby="contact-heading">
+    <h2 id="contact-heading">Need Help or Have Questions?</h2>
+    <p>Email us at <a href="mailto:support@realestateai.com">support@realestateai.com</a></p>
+    <p>Call us: <a href="tel:+18005551234">+1‑800‑555‑1234</a></p>
+    <p>Or visit our <a href="/contact">Contact Page</a> for more support.</p>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    &copy; 2025 RealEstateAI |
+    <a href="/privacy">Privacy Policy</a> |
+    <a href="/terms">Terms of Service</a>
+  </footer>
+
+  <!-- CHATBOT BUTTON -->
+  <button id="chatbot-btn" aria-label="Open chatbot assistant">💬</button>
+
+  <!-- CHATBOT WINDOW -->
+  <div id="chatbot-window" role="region" aria-live="polite" aria-label="Chatbot conversation window">
+    <div id="chatbot-header">
+      <span>Property Assistant</span>
+      <button id="chatbot-close-btn" aria-label="Close chatbot window">&times;</button>
+    </div>
+    <div id="chatbot-messages" tabindex="0" aria-live="polite" aria-atomic="false" aria-relevant="additions"></div>
+    <form id="chatbot-form" aria-label="Chatbot input form" autocomplete="off">
+      <input
+        id="chatbot-input"
+        type="text"
+        placeholder="Ask about property prices..."
+        aria-label="Chat input field"
+        required
+      />
+      <button type="submit" id="chatbot-send-btn" aria-label="Send message">➤</button>
+    </form>
+  </div>
+
+  <script>
+    // Navigation buttons
+    document.getElementById('predictBtn').addEventListener('click', () => {
+      window.location.href = '/predict';
+    });
+    document.getElementById('compareBtn').addEventListener('click', () => {
+      window.location.href = '/compare';
+    });
+    document.getElementById('learnMoreBtn').addEventListener('click', () => {
+      document.getElementById('features').scrollIntoView({ behavior: 'smooth' });
+    });
+    document.getElementById('getEstimateBtn').addEventListener('click', () => {
+      openChatbot();
+    });
+
+    // FAQ toggle logic
+    const faqItems = document.querySelectorAll('.faq-item');
+    faqItems.forEach(item => {
+      item.addEventListener('click', () => {
+        const expanded = item.getAttribute('aria-expanded') === 'true';
+        item.setAttribute('aria-expanded', !expanded);
+      });
+      item.addEventListener('keydown', e => {
+        if(e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          item.click();
+        }
+      });
+    });
+
+    // Chatbot logic
+    const chatbotBtn = document.getElementById('chatbot-btn');
+    const chatbotWindow = document.getElementById('chatbot-window');
+    const chatbotCloseBtn = document.getElementById('chatbot-close-btn');
+    const chatbotMessages = document.getElementById('chatbot-messages');
+    const chatbotForm = document.getElementById('chatbot-form');
+    const chatbotInput = document.getElementById('chatbot-input');
+
+    function openChatbot() {
+      chatbotWindow.style.display = 'flex';
+      chatbotInput.focus();
+    }
+    function closeChatbot() {
+      chatbotWindow.style.display = 'none';
+      chatbotInput.value = '';
+      chatbotMessages.innerHTML = '';
+    }
+
+    chatbotBtn.addEventListener('click', openChatbot);
+    chatbotCloseBtn.addEventListener('click', closeChatbot);
+
+    // Simulate chatbot responses (replace this with actual AI backend integration)
+    chatbotForm.addEventListener('submit', e => {
+      e.preventDefault();
+      const userMessage = chatbotInput.value.trim();
+      if (!userMessage) return;
+      addChatMessage(userMessage, 'user');
+      chatbotInput.value = '';
+      simulateBotResponse(userMessage);
+    });
+
+    function addChatMessage(message, sender) {
+      const msg = document.createElement('div');
+      msg.className = 'chatbot-message ' + sender;
+      msg.textContent = message;
+      chatbotMessages.appendChild(msg);
+      chatbotMessages.scrollTop = chatbotMessages.scrollHeight;
+    }
+
+    function simulateBotResponse(userText) {
+      // Basic dummy response, you can expand this or connect to API
+      const lowerText = userText.toLowerCase();
+      let botReply = "Sorry, I didn't understand that. Could you please rephrase?";
+
+      if (lowerText.includes('price') || lowerText.includes('estimate')) {
+        botReply = "Please provide the property details like location, size, and type, and I'll estimate the price for you.";
+      } else if (lowerText.includes('hello') || lowerText.includes('hi')) {
+        botReply = "Hello! How can I assist you with Bangalore property prices today?";
+      } else if (lowerText.includes('compare')) {
+        botReply = "You can use the Compare feature to analyze multiple properties side-by-side. Click on the Compare button above.";
+      }
+
+      setTimeout(() => addChatMessage(botReply, 'bot'), 1000);
+    }
+  </script>
+</body>
+</html>

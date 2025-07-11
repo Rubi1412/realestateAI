@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Compare Property Costs</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="/static/style.css">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <style>
+    body.dark-mode {
+      background-color: #121212;
+      color: #e0e0e0;
+    }
+    .dark-mode select,
+    .dark-mode input {
+      background-color: #1e1e1e;
+      color: #f0f0f0;
+      border: 1px solid #333;
+    }
+    .dark-mode .compare-box {
+      background-color: #1c1c1c;
+      border-color: #333;
+    }
+    .dark-mode .result,
+    .dark-mode .note {
+      background-color: #2a2a2a;
+      color: #fff;
+    }
+
+    .compare-box {
+      padding: 20px;
+      margin: 20px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      background: #f9f9f9;
+    }
+    .compare-container {
+      display: flex;
+      justify-content: space-around;
+      flex-wrap: wrap;
+    }
+    .result {
+      font-weight: bold;
+      margin-top: 10px;
+    }
+    .note {
+      font-size: 14px;
+      margin-top: 6px;
+    }
+    .highlight {
+      background-color: #d4edda !important; /* green */
+    }
+    .less-optimal {
+      background-color: #f8d7da !important; /* red */
+    }
+    .summary-box {
+      text-align: center;
+      margin: 30px 0;
+      font-size: 18px;
+      font-weight: 500;
+    }
+    .history-box {
+      max-width: 800px;
+      margin: 30px auto;
+      border-collapse: collapse;
+      width: 100%;
+    }
+    .history-box th, .history-box td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: center;
+    }
+    .history-box th {
+      background-color: #f2f2f2;
+    }
+    .dark-mode .history-box th {
+      background-color: #333;
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="logo">🏠 RealEstateAI</div>
+    <ul class="nav-links">
+      <li><a href="/">Home</a></li>
+      <li><a href="/predict">Predict</a></li>
+      <li><a href="/compare" class="active">Compare</a></li>
+    </ul>
+  </nav>
+
+  <div class="dark-toggle" style="padding: 0 30px;">
+    <label><input type="checkbox" id="darkToggle"> Dark Mode</label>
+  </div>
+
+  <h2 style="text-align:center;">📊 Compare Property Estimates</h2>
+
+  <div class="compare-container">
+    <!-- Property 1 -->
+    <div class="compare-box">
+      <h3>Property 1</h3>
+      <input type="number" id="sqft1" placeholder="Total Sqft" />
+      <select id="bhk1">
+        <option value="">Select BHK</option>
+        <option value="1">1 BHK</option>
+        <option value="2">2 BHK</option>
+        <option value="3">3 BHK</option>
+      </select>
+      <select id="bath1">
+        <option value="">Select Bath</option>
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+      </select>
+      <select id="location1">
+        <option>Select Location</option>
+      </select>
+      <div class="result" id="result1">—</div>
+      <div class="note" id="note1"></div>
+    </div>
+
+    <!-- Property 2 -->
+    <div class="compare-box">
+      <h3>Property 2</h3>
+      <input type="number" id="sqft2" placeholder="Total Sqft" />
+      <select id="bhk2">
+        <option value="">Select BHK</option>
+        <option value="1">1 BHK</option>
+        <option value="2">2 BHK</option>
+        <option value="3">3 BHK</option>
+      </select>
+      <select id="bath2">
+        <option value="">Select Bath</option>
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+      </select>
+      <select id="location2">
+        <option>Select Location</option>
+      </select>
+      <div class="result" id="result2">—</div>
+      <div class="note" id="note2"></div>
+    </div>
+  </div>
+
+  <div class="summary-box" id="summaryBox"></div>
+
+  <button class="submit" onclick="comparePrices()" style="display:block;margin:20px auto;">Compare Now</button>
+
+  <!-- History Table -->
+  <table class="history-box" id="historyTable">
+    <thead>
+      <tr>
+        <th>Property</th>
+        <th>Sqft</th>
+        <th>BHK</th>
+        <th>Bath</th>
+        <th>Location</th>
+        <th>Price (Lakh)</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    // Fetch locations from backend
+    fetch("/get_location_names")
+      .then(res => res.json())
+      .then(data => {
+        const locations = data.locations;
+        const loc1 = document.getElementById("location1");
+        const loc2 = document.getElementById("location2");
+
+        locations.forEach(loc => {
+          let opt1 = new Option(loc.charAt(0).toUpperCase() + loc.slice(1), loc);
+          let opt2 = new Option(loc.charAt(0).toUpperCase() + loc.slice(1), loc);
+          loc1.add(opt1);
+          loc2.add(opt2);
+        });
+      });
+
+    // Compare logic
+    function comparePrices() {
+      const sqft1 = parseFloat(document.getElementById("sqft1").value);
+      const bhk1 = parseInt(document.getElementById("bhk1").value);
+      const bath1 = parseInt(document.getElementById("bath1").value);
+      const loc1 = document.getElementById("location1").value;
+
+      const sqft2 = parseFloat(document.getElementById("sqft2").value);
+      const bhk2 = parseInt(document.getElementById("bhk2").value);
+      const bath2 = parseInt(document.getElementById("bath2").value);
+      const loc2 = document.getElementById("location2").value;
+
+      if (!(sqft1 && bhk1 && bath1 && loc1 && sqft2 && bhk2 && bath2 && loc2)) {
+        alert("Please fill in all fields for both properties.");
+        return;
+      }
+
+      $.post("/predict_home_price", {
+        total_sqft: sqft1,
+        bhk: bhk1,
+        bath: bath1,
+        location: loc1
+      }, function(data1) {
+        const price1 = data1.estimated_price;
+        document.getElementById("result1").innerText = "₹ " + price1 + " Lakh";
+        addNote("note1", price1);
+
+        $.post("/predict_home_price", {
+          total_sqft: sqft2,
+          bhk: bhk2,
+          bath: bath2,
+          location: loc2
+        }, function(data2) {
+          const price2 = data2.estimated_price;
+          document.getElementById("result2").innerText = "₹ " + price2 + " Lakh";
+          addNote("note2", price2);
+
+          highlightBetter(price1, price2);
+          showSummary(price1, sqft1, price2, sqft2);
+          addToHistory("Property 1", sqft1, bhk1, bath1, loc1, price1);
+          addToHistory("Property 2", sqft2, bhk2, bath2, loc2, price2);
+        });
+      });
+    }
+
+    function addNote(elementId, price) {
+      let note = "";
+      if (price <= 40) note = "✅ Affordable";
+      else if (price <= 80) note = "💡 Moderate";
+      else note = "🔔 Premium / Luxury";
+      document.getElementById(elementId).innerText = note;
+    }
+
+    function highlightBetter(price1, price2) {
+      const box1 = document.getElementById("result1");
+      const box2 = document.getElementById("result2");
+
+      box1.classList.remove("highlight", "less-optimal");
+      box2.classList.remove("highlight", "less-optimal");
+
+      if (price1 < price2) {
+        box1.classList.add("highlight");
+        box2.classList.add("less-optimal");
+      } else if (price2 < price1) {
+        box2.classList.add("highlight");
+        box1.classList.add("less-optimal");
+      }
+    }
+
+    function showSummary(p1, s1, p2, s2) {
+      const diff = Math.abs(p1 - p2).toFixed(2);
+      const sqdiff = Math.abs(s1 - s2);
+      let cheaper = p1 < p2 ? "Property 1" : "Property 2";
+      document.getElementById("summaryBox").innerText = `${cheaper} is cheaper by ₹ ${diff} Lakh and has ${sqdiff} sqft difference.`;
+    }
+
+    function addToHistory(label, sqft, bhk, bath, loc, price) {
+      const table = document.getElementById("historyTable").getElementsByTagName("tbody")[0];
+      const row = table.insertRow(0); // Insert on top
+      row.innerHTML = `
+        <td>${label}</td>
+        <td>${sqft}</td>
+        <td>${bhk}</td>
+        <td>${bath}</td>
+        <td>${loc}</td>
+        <td>₹ ${price} Lakh</td>
+      `;
+      // Limit to 6 rows (3 comparisons)
+      if (table.rows.length > 6) table.deleteRow(6);
+    }
+
+    // Dark mode toggle
+    document.getElementById("darkToggle").addEventListener("change", function() {
+      document.body.classList.toggle("dark-mode", this.checked);
+    });
+  </script>
+
+</body>
+</html>
